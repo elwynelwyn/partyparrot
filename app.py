@@ -10,7 +10,19 @@ EN_SPACE = '\u2002'
 
 @app.route('/', methods=['GET'])
 def index():
-    return 'OK'
+    text = request.args.get('msg')
+    if not text:
+        return 'I need some text.', 200
+    
+    try:
+        out = partyparrot.convert_str_to_emoji(text, space=(EN_SPACE * 3))
+
+        return jsonify(
+            response_type='in_channel',
+            text=partyparrot.make_slack_compatible(out)
+        )
+    except ValueError as e:
+        return jsonify(text=str(e))
 
 
 @app.route('/', methods=['POST'])
